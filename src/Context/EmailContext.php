@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use SilverStripe\BehatExtension\Utility\TestMailer;
-use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\Email\Mailer;
 use SilverStripe\Core\Injector\Injector;
 use Symfony\Component\DomCrawler\Crawler;
@@ -51,8 +50,6 @@ class EmailContext implements Context
         // to ensure its available both in CLI execution and the tested browser session
         $this->mailer = new TestMailer();
         Injector::inst()->registerService($this->mailer, Mailer::class);
-        Email::config()->update("send_all_emails_to", null);
-        Email::config()->update('admin_email', 'no-reply@example.com');
     }
 
     /**
