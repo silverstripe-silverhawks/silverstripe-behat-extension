@@ -38,7 +38,7 @@ class TestMailer extends BaseTestMailer
     {
         $matches = $this->findEmails($to, $from, $subject, $content);
                 //got the count of matches emails
-                $emailCount = count($matches);
+                $emailCount = count($matches ?? []);
                 //get the last(latest) one
         return $matches ? $matches[$emailCount-1] : null;
     }
@@ -70,7 +70,7 @@ class TestMailer extends BaseTestMailer
                 $value = (isset($args[$i])) ? $args[$i] : null;
                 if ($value) {
                     if ($value[0] == '/') {
-                        $matched = preg_match($value, $email->$field);
+                        $matched = preg_match($value ?? '', $email->$field ?? '');
                     } else {
                         $matched = ($value == $email->$field);
                     }
@@ -93,7 +93,7 @@ class TestMailer extends BaseTestMailer
         if (!isset($state->emails)) {
             $state->emails = array();
         }
-        $state->emails[] = array_filter($data);
+        $state->emails[] = array_filter($data ?? []);
         $this->testSessionEnvironment->applyState($state);
     }
 }

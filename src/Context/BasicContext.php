@@ -97,7 +97,7 @@ class BasicContext implements Context
     {
         $result = [];
         foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, $parent)) {
+            if (is_subclass_of($class, $parent ?? '')) {
                 $result[] = $class;
             }
         }
@@ -211,9 +211,9 @@ JS;
         }
         try {
             $ajaxEnabledSteps = $this->getMainContext()->getAjaxSteps();
-            $ajaxEnabledSteps = implode('|', array_filter($ajaxEnabledSteps));
+            $ajaxEnabledSteps = implode('|', array_filter($ajaxEnabledSteps ?? []));
 
-            if (empty($ajaxEnabledSteps) || !preg_match('/(' . $ajaxEnabledSteps . ')/i', $event->getStep()->getText())) {
+            if (empty($ajaxEnabledSteps) || !preg_match('/(' . $ajaxEnabledSteps . ')/i', $event->getStep()->getText() ?? '')) {
                 return;
             }
 
@@ -264,9 +264,9 @@ JS;
         }
         try {
             $ajaxEnabledSteps = $this->getMainContext()->getAjaxSteps();
-            $ajaxEnabledSteps = implode('|', array_filter($ajaxEnabledSteps));
+            $ajaxEnabledSteps = implode('|', array_filter($ajaxEnabledSteps ?? []));
 
-            if (empty($ajaxEnabledSteps) || !preg_match('/(' . $ajaxEnabledSteps . ')/i', $event->getStep()->getText())) {
+            if (empty($ajaxEnabledSteps) || !preg_match('/(' . $ajaxEnabledSteps . ')/i', $event->getStep()->getText() ?? '')) {
                 return;
             }
 
@@ -377,7 +377,7 @@ JS;
     {
         $page = $this->getSession()->getPage();
         // See https://mathiasbynens.be/notes/css-escapes
-        $escapedTitle = addcslashes($title, '!"#$%&\'()*+,-./:;<=>?@[\]^`{|}~');
+        $escapedTitle = addcslashes($title ?? '', '!"#$%&\'()*+,-./:;<=>?@[\]^`{|}~');
         $matchedEl = null;
         $searches = [
             ['named', ['link_or_button', "'{$title}'"]],
@@ -406,7 +406,7 @@ JS;
     public function iShouldSeeAButton($negative, $text)
     {
         $button = $this->findNamedButton($text);
-        if (trim($negative)) {
+        if (trim($negative ?? '')) {
             Assert::assertNull($button, sprintf('%s button found', $text));
         } else {
             Assert::assertNotNull($button, sprintf('%s button not found', $text));
@@ -430,9 +430,9 @@ JS;
      */
     public function stepIPressTheButtons($text)
     {
-        $buttonNames = explode('|', $text);
+        $buttonNames = explode('|', $text ?? '');
         foreach ($buttonNames as $name) {
-            $button = $this->findNamedButton(trim($name));
+            $button = $this->findNamedButton(trim($name ?? ''));
             if ($button) {
                 break;
             }
@@ -718,14 +718,14 @@ JS;
      */
     public function castRelativeToAbsoluteTime($prefix, $val)
     {
-        $timestamp = strtotime($val);
+        $timestamp = strtotime($val ?? '');
         if (!$timestamp) {
             throw new InvalidArgumentException(sprintf(
                 "Can't resolve '%s' into a valid datetime value",
                 $val
             ));
         }
-        return date($this->timeFormat, $timestamp);
+        return date($this->timeFormat ?? '', $timestamp);
     }
 
     /**
@@ -740,14 +740,14 @@ JS;
      */
     public function castRelativeToAbsoluteDatetime($prefix, $val)
     {
-        $timestamp = strtotime($val);
+        $timestamp = strtotime($val ?? '');
         if (!$timestamp) {
             throw new InvalidArgumentException(sprintf(
                 "Can't resolve '%s' into a valid datetime value",
                 $val
             ));
         }
-        return date($this->datetimeFormat, $timestamp);
+        return date($this->datetimeFormat ?? '', $timestamp);
     }
 
     /**
@@ -762,14 +762,14 @@ JS;
      */
     public function castRelativeToAbsoluteDate($prefix, $val)
     {
-        $timestamp = strtotime($val);
+        $timestamp = strtotime($val ?? '');
         if (!$timestamp) {
             throw new InvalidArgumentException(sprintf(
                 "Can't resolve '%s' into a valid datetime value",
                 $val
             ));
         }
-        return date($this->dateFormat, $timestamp);
+        return date($this->dateFormat ?? '', $timestamp);
     }
 
     public function getDateFormat()
@@ -828,7 +828,7 @@ JS;
         Assert::assertNotNull($element, sprintf("Element '%s' not found", $name));
 
         $disabledAttribute = $element->getAttribute('disabled');
-        if (trim($negate)) {
+        if (trim($negate ?? '')) {
             Assert::assertNull($disabledAttribute, sprintf("Failed asserting element '%s' is not disabled", $name));
         } else {
             Assert::assertNotNull($disabledAttribute, sprintf("Failed asserting element '%s' is disabled", $name));
@@ -929,11 +929,11 @@ JS;
         Assert::assertNotNull($regionObj);
 
         $actual = $regionObj->getText();
-        $actual = preg_replace('/\s+/u', ' ', $actual);
-        $regex  = '/' . preg_quote($text, '/') . '/ui';
+        $actual = preg_replace('/\s+/u', ' ', $actual ?? '');
+        $regex  = '/' . preg_quote($text ?? '', '/') . '/ui';
 
-        if (trim($negate)) {
-            if (preg_match($regex, $actual)) {
+        if (trim($negate ?? '')) {
+            if (preg_match($regex ?? '', $actual ?? '')) {
                 $message = sprintf(
                     'The text "%s" was found in the text of the "%s" region on the page %s.',
                     $text,
@@ -944,7 +944,7 @@ JS;
                 throw new \Exception($message);
             }
         } else {
-            if (!preg_match($regex, $actual)) {
+            if (!preg_match($regex ?? '', $actual ?? '')) {
                 $message = sprintf(
                     'The text "%s" was not found anywhere in the text of the "%s" region on the page %s.',
                     $text,
@@ -1079,15 +1079,15 @@ JS;
 
         // Check both of the texts exist in the element
         $text = $ele->getText();
-        Assert::assertTrue(strpos($text, $textBefore) !== 'FALSE', sprintf('%s not found in the element %s', $textBefore, $element));
-        Assert::assertTrue(strpos($text, $textAfter) !== 'FALSE', sprintf('%s not found in the element %s', $textAfter, $element));
+        Assert::assertTrue(strpos($text ?? '', $textBefore ?? '') !== 'FALSE', sprintf('%s not found in the element %s', $textBefore, $element));
+        Assert::assertTrue(strpos($text ?? '', $textAfter ?? '') !== 'FALSE', sprintf('%s not found in the element %s', $textAfter, $element));
 
         /// Use strpos to get the position of the first occurrence of the two texts (case-sensitive)
         // and compare them with the given order (before or after)
         if ($order === 'before') {
-            Assert::assertTrue(strpos($text, $textBefore) < strpos($text, $textAfter));
+            Assert::assertTrue(strpos($text ?? '', $textBefore ?? '') < strpos($text ?? '', $textAfter ?? ''));
         } else {
-            Assert::assertTrue(strpos($text, $textBefore) > strpos($text, $textAfter));
+            Assert::assertTrue(strpos($text ?? '', $textBefore ?? '') > strpos($text ?? '', $textAfter ?? ''));
         }
     }
 
@@ -1302,7 +1302,7 @@ JS;
             $not = '';
             $cssSelector = $not;
         }
-        $sel = str_replace('"', '\\"', $cssSelector);
+        $sel = str_replace('"', '\\"', $cssSelector ?? '');
         $js = <<<JS
 return document.querySelector("$sel");
 JS;
@@ -1330,8 +1330,8 @@ JS;
             $field->selectOption($value);
         } else {
             $xpath = $field->getXpath();
-            $xpath = str_replace(['"', "\n"], ['\"', ''], $xpath);
-            $value = str_replace('"', '\"', $value);
+            $xpath = str_replace(['"', "\n"], ['\"', ''], $xpath ?? '');
+            $value = str_replace('"', '\"', $value ?? '');
             $js = <<<JS
                 return (function() {
                     let select = document.evaluate("{$xpath}", document).iterateNext();
@@ -1360,8 +1360,8 @@ JS;
     public function theRenderedHtmlShouldContain($not, $htmlFragment)
     {
         $html = $this->getSession()->getPage()->getOuterHtml();
-        $htmlFragment = str_replace('\"', '"', $htmlFragment);
-        $contains = strpos($html, $htmlFragment) !== false;
+        $htmlFragment = str_replace('\"', '"', $htmlFragment ?? '');
+        $contains = strpos($html ?? '', $htmlFragment ?? '') !== false;
         if ($not) {
             Assert::assertFalse($contains, "HTML fragment {$htmlFragment} was in rendered HTML when it should not have been");
         } else {
@@ -1463,18 +1463,18 @@ JS;
             return;
         }
         $modifier = null;
-        $pos = strpos($keyCombo, '-');
+        $pos = strpos($keyCombo ?? '', '-');
         if ($pos !== false && $pos !== 0) {
-            list($modifier, $char) = explode('-', $keyCombo);
+            list($modifier, $char) = explode('-', $keyCombo ?? '');
         } else {
             $char = $keyCombo;
         }
         // handle special chars e.g. "space"
-        if (defined(WebDriverKeys::class . '::' . strtoupper($char))) {
-            $char = constant(WebDriverKeys::class . '::' . strtoupper($char));
+        if (defined(WebDriverKeys::class . '::' . strtoupper($char ?? ''))) {
+            $char = constant(WebDriverKeys::class . '::' . strtoupper($char ?? ''));
         }
         if ($modifier) {
-            $modifier = strtoupper($modifier);
+            $modifier = strtoupper($modifier ?? '');
             if (defined(WebDriverKeys::class . '::' . $modifier)) {
                 $modifier = constant(WebDriverKeys::class . '::' . $modifier);
             } else {
@@ -1495,13 +1495,13 @@ JS;
     {
         Assert::assertNotNull($this->fixtureContext, 'FixtureContext was not found so cannot know location of fixture files');
         $path = $this->fixtureContext->getFilesPath() . '/' . $filename;
-        $path = str_replace('//', '/', $path);
+        $path = str_replace('//', '/', $path ?? '');
         Assert::assertNotEmpty($path, 'Fixture files path is empty');
         $field = $this->getElement($locator);
         $filesPath = $this->fixtureContext->getFilesPath();
         if ($filesPath) {
-            $fullPath = rtrim(realpath($filesPath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $path;
-            if (is_file($fullPath)) {
+            $fullPath = rtrim(realpath($filesPath ?? '') ?? '', DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $path;
+            if (is_file($fullPath ?? '')) {
                 $path = $fullPath;
             }
         }
@@ -1526,12 +1526,12 @@ JS;
         }
         Assert::assertNotNull($link, "Link {$locator} was not found");
         $html = $link->getOuterHtml();
-        preg_match('#href=([\'"])#', $html, $m);
+        preg_match('#href=([\'"])#', $html ?? '', $m);
         $q = $m[1];
-        preg_match("#href={$q}(.+?){$q}#", $html, $m);
-        $href = str_replace("'", "\\'", $m[1]);
-        if (strpos($href, 'http') !== 0) {
-            $href = rtrim($href, '/');
+        preg_match("#href={$q}(.+?){$q}#", $html ?? '', $m);
+        $href = str_replace("'", "\\'", $m[1] ?? '');
+        if (strpos($href ?? '', 'http') !== 0) {
+            $href = rtrim($href ?? '', '/');
             $href = "/{$href}";
         }
         $this->getSession()->executeScript("document.location.href = '{$href}';");

@@ -63,7 +63,7 @@ class Extension implements ExtensionInterface
         ];
 
         foreach ($options as $file) {
-            if (file_exists($file)) {
+            if (file_exists($file ?? '')) {
                 require_once $file;
                 $found = true;
                 break;

@@ -158,7 +158,7 @@ class ModuleSuiteLocator implements Controller
         // Find all candidate paths
         foreach ([ "{$path}/", "{$path}/{$pathSuffix}"] as $parent) {
             foreach ([$parent.'behat.yml', $parent.'.behat.yml'] as $candidate) {
-                if (file_exists($candidate)) {
+                if (file_exists($candidate ?? '')) {
                     return $candidate;
                 }
             }
@@ -178,7 +178,7 @@ class ModuleSuiteLocator implements Controller
     {
         $path = $this->findModuleConfig($module);
         $yamlParser = new Parser();
-        $config = $yamlParser->parse(file_get_contents($path));
+        $config = $yamlParser->parse(file_get_contents($path ?? ''));
         if (empty($config['default']['suites'][$suite])) {
             throw new Exception("Path {$path} does not contain default.suites.{$suite} config");
         }

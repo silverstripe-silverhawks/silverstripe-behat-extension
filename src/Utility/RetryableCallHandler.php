@@ -112,10 +112,10 @@ class RetryableCallHandler implements CallHandler
             // Determine whether to call with retries
             if ($retry) {
                 $return = $this->retryThrowable(function () use ($callable, $arguments) {
-                    return call_user_func_array($callable, $arguments);
+                    return call_user_func_array($callable, $arguments ?? []);
                 }, $this->retrySeconds);
             } else {
-                $return = call_user_func_array($callable, $arguments);
+                $return = call_user_func_array($callable, $arguments ?? []);
             }
         } catch (Exception $caught) {
             $exception = $caught;
@@ -144,7 +144,7 @@ class RetryableCallHandler implements CallHandler
     private function startErrorAndOutputBuffering(Call $call)
     {
         $errorReporting = $call->getErrorReportingLevel() ? : $this->errorReportingLevel;
-        set_error_handler(array($this, 'handleError'), $errorReporting);
+        set_error_handler(array($this, 'handleError'), $errorReporting ?? 0);
         $this->obStarted = ob_start();
     }
 

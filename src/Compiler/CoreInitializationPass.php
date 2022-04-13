@@ -63,7 +63,7 @@ class CoreInitializationPass implements CompilerPassInterface
             $container->setParameter('paths.modules.'.$module->getShortName(), $module->getPath());
             $composerName = $module->getComposerName();
             if ($composerName) {
-                list($vendor,$name) = explode('/', $composerName);
+                list($vendor,$name) = explode('/', $composerName ?? '');
                 $container->setParameter('paths.modules.'.$vendor.'.'.$name, $module->getPath());
             }
         }

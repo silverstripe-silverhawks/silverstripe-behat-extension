@@ -32,7 +32,7 @@ class LoginContext implements Context
 
         $this->getMainContext()->getSession()->visit($adminUrl);
 
-        if (0 == strpos($this->getMainContext()->getSession()->getCurrentUrl(), $loginUrl)) {
+        if (0 == strpos($this->getMainContext()->getSession()->getCurrentUrl() ?? '', $loginUrl ?? '')) {
             $this->stepILogInWith('admin', 'password');
             Assert::assertStringStartsWith($adminUrl, $this->getMainContext()->getSession()->getCurrentUrl());
         }

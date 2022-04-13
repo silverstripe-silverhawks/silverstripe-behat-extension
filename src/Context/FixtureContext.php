@@ -257,12 +257,12 @@ class FixtureContext implements Context
         $class = $this->convertTypeToClass($type);
         preg_match_all(
             '/"(?<key>[^"]+)"\s*=\s*"(?<value>[^"]+)"/',
-            $data,
+            $data ?? '',
             $matches
         );
         $fields = $this->convertFields(
             $class,
-            array_combine($matches['key'], $matches['value'])
+            array_combine($matches['key'] ?? [], $matches['value'] ?? [])
         );
         $fields = $this->prepareFixture($class, $id, $fields);
         // We should check if this fixture object already exists - if it does, we update it. If not, we create it
@@ -403,20 +403,20 @@ class FixtureContext implements Context
         $manyField = null;
         $oneField = null;
         if ($relationObj->manyMany()) {
-            $manyField = array_search($class, $relationObj->manyMany());
-            if ($manyField && strlen($relationName) > 0) {
+            $manyField = array_search($class, $relationObj->manyMany() ?? []);
+            if ($manyField && strlen($relationName ?? '') > 0) {
                 $manyField = $relationName;
             }
         }
         if (empty($manyField) && $relationObj->hasMany(true)) {
-            $manyField = array_search($class, $relationObj->hasMany());
-            if ($manyField && strlen($relationName) > 0) {
+            $manyField = array_search($class, $relationObj->hasMany() ?? []);
+            if ($manyField && strlen($relationName ?? '') > 0) {
                 $manyField = $relationName;
             }
         }
         if (empty($manyField) && $relationObj->hasOne()) {
-            $oneField = array_search($class, $relationObj->hasOne());
-            if ($oneField && strlen($relationName) > 0) {
+            $oneField = array_search($class, $relationObj->hasOne() ?? []);
+            if ($oneField && strlen($relationName ?? '') > 0) {
                 $oneField = $relationName;
             }
         }
@@ -555,12 +555,12 @@ class FixtureContext implements Context
     {
         preg_match_all(
             '/"(?<key>[^"]+)"\s*=\s*"(?<value>[^"]+)"/',
-            $data,
+            $data ?? '',
             $matches
         );
         $fields = $this->convertFields(
             Member::class,
-            array_combine($matches['key'], $matches['value'])
+            array_combine($matches['key'] ?? [], $matches['value'] ?? [])
         );
 
         /** @var Group $group */
@@ -587,7 +587,7 @@ class FixtureContext implements Context
     public function stepCreateGroupWithPermissions($id, $permissionStr)
     {
         // Convert natural language permissions to codes
-        preg_match_all('/"([^"]+)"/', $permissionStr, $matches);
+        preg_match_all('/"([^"]+)"/', $permissionStr ?? '', $matches);
         $permissions = $matches[1];
         $codes = Permission::get_codes(false);
 
@@ -652,7 +652,7 @@ class FixtureContext implements Context
     {
         // Validate the extension
         Assert::assertTrue(
-            class_exists($extension) && is_subclass_of($extension, Extension::class),
+            class_exists($extension ?? '') && is_subclass_of($extension, Extension::class),
             'Given extension does not extend Extension'
         );
 
@@ -662,7 +662,7 @@ class FixtureContext implements Context
         $targetClass::add_extension($extension);
 
         // Write config for this extension too...
-        $snakedExtension = strtolower(str_replace('\\', '-', $extension));
+        $snakedExtension = strtolower(str_replace('\\', '-', $extension ?? '') ?? '');
         $config = <<<YAML
 ---
 Name: testonly-enable-extension-$snakedExtension
@@ -674,7 +674,7 @@ YAML;
 
         $filename = 'enable-' . $snakedExtension . '.yml';
         $destPath = $this->getDestinationConfigFolder($filename);
-        file_put_contents($destPath, $config);
+        file_put_contents($destPath ?? '', $config);
 
         // Remember to cleanup...
         $this->activatedConfigFiles[] = $destPath;
@@ -741,8 +741,8 @@ YAML;
      */
     public function lookupFixtureReference($string)
     {
-        if (preg_match('/^=>/', $string)) {
-            list($className, $identifier) = explode('.', preg_replace('/^=>/', '', $string), 2);
+        if (preg_match('/^=>/', $string ?? '')) {
+            list($className, $identifier) = explode('.', preg_replace('/^=>/', '', $string ?? '') ?? '', 2);
             $id = $this->getFixtureFactory()->getId($className, $identifier);
             if (!$id) {
                 throw new InvalidArgumentException(sprintf(
@@ -768,7 +768,7 @@ YAML;
         $class = $this->convertTypeToClass($type);
         $fields = $this->prepareFixture($class, $id);
         $record = $this->getFixtureFactory()->createObject($class, $id, $fields);
-        $date = date("Y-m-d H:i:s", strtotime($time));
+        $date = date("Y-m-d H:i:s", strtotime($time ?? ''));
         $table = $record->baseTable();
         $field = ($mod == 'created') ? 'Created' : 'LastEdited';
         DB::prepared_query(
@@ -821,8 +821,8 @@ YAML;
 
 
         $relativeTargetPath = (isset($data['Filename'])) ? $data['Filename'] : $identifier;
-        $relativeTargetPath = preg_replace('/^' . ASSETS_DIR . '\/?/', '', $relativeTargetPath);
-        $sourcePath = $this->joinPaths($this->getFilesPath(), basename($relativeTargetPath));
+        $relativeTargetPath = preg_replace('/^' . ASSETS_DIR . '\/?/', '', $relativeTargetPath ?? '');
+        $sourcePath = $this->joinPaths($this->getFilesPath(), basename($relativeTargetPath ?? ''));
 
         // Create file or folder on filesystem
         if ($class == 'SilverStripe\\Assets\\Folder' || is_subclass_of($class, 'SilverStripe\\Assets\\Folder')) {
@@ -830,7 +830,7 @@ YAML;
             $data['ID'] = $parent->ID;
         } else {
             // Check file exists
-            if (!file_exists($sourcePath)) {
+            if (!file_exists($sourcePath ?? '')) {
                 throw new InvalidArgumentException(sprintf(
                     'Source file for "%s" cannot be found in "%s"',
                     $relativeTargetPath,
@@ -840,8 +840,8 @@ YAML;
 
             // Get parent
             $parentID = 0;
-            if (strstr($relativeTargetPath, '/')) {
-                $folderName = dirname($relativeTargetPath);
+            if (strstr($relativeTargetPath ?? '', '/')) {
+                $folderName = dirname($relativeTargetPath ?? '');
                 $parent = Folder::find_or_make($folderName);
                 if ($parent) {
                     $parentID = $parent->ID;
@@ -865,7 +865,7 @@ YAML;
             $data['FileVariant'] = $asset['Variant'];
         }
         if (!isset($data['Name'])) {
-            $data['Name'] = basename($relativeTargetPath);
+            $data['Name'] = basename($relativeTargetPath ?? '');
         }
 
         // Save assets
@@ -894,17 +894,17 @@ YAML;
      */
     protected function convertTypeToClass($type)
     {
-        $type = trim($type);
+        $type = trim($type ?? '');
 
         // Try direct mapping
-        $class = str_replace(' ', '', ucwords($type));
-        if (class_exists($class) && is_subclass_of($class, DataObject::class)) {
+        $class = str_replace(' ', '', ucwords($type ?? ''));
+        if (class_exists($class ?? '') && is_subclass_of($class, DataObject::class)) {
             return ClassInfo::class_name($class);
         }
 
         // Fall back to singular names
-        foreach (array_values(ClassInfo::subclassesFor(DataObject::class)) as $candidate) {
-            if (class_exists($candidate) && strcasecmp(singleton($candidate)->singular_name(), $type) === 0) {
+        foreach (array_values(ClassInfo::subclassesFor(DataObject::class) ?? []) as $candidate) {
+            if (class_exists($candidate ?? '') && strcasecmp(singleton($candidate)->singular_name() ?? '', $type ?? '') === 0) {
                 return $candidate;
             }
         }
@@ -927,7 +927,7 @@ YAML;
     {
         $labels = singleton($class)->fieldLabels();
         foreach ($fields as $fieldName => $fieldVal) {
-            if ($fieldLabelKey = array_search($fieldName, $labels)) {
+            if ($fieldLabelKey = array_search($fieldName, $labels ?? [])) {
                 unset($fields[$fieldName]);
                 $fields[$labels[$fieldLabelKey]] = $fieldVal;
             }
@@ -943,9 +943,9 @@ YAML;
             $paths = array_merge($paths, (array)$arg);
         }
         foreach ($paths as &$path) {
-            $path = trim($path, '/');
+            $path = trim($path ?? '', '/');
         }
-        if (substr($args[0], 0, 1) == '/') {
+        if (substr($args[0] ?? '', 0, 1) == '/') {
             $paths[0] = '/' . $paths[0];
         }
         return join('/', $paths);
@@ -959,8 +959,8 @@ YAML;
         }
 
         foreach ($this->activatedConfigFiles as $configFile) {
-            if (file_exists($configFile)) {
-                unlink($configFile);
+            if (file_exists($configFile ?? '')) {
+                unlink($configFile ?? '');
             }
         }
         $this->activatedConfigFiles = [];

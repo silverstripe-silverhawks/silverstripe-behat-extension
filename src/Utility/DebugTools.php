@@ -118,9 +118,9 @@ trait DebugTools
         // prefix with zz_ so that it alpha sorts in the directory lower than screenshots which
         // will typically be referred to far more often.  This is mainly for when you have
         // enabled `dumpRenderedHtmlAfterEveryStep`
-        $path = sprintf('%s/zz_%s_%d.html', $path, basename($feature->getFile()), $step->getLine());
+        $path = sprintf('%s/zz_%s_%d.html', $path, basename($feature->getFile() ?? ''), $step->getLine());
         $html = $this->getSession()->getPage()->getOuterHtml();
-        file_put_contents($path, $html);
+        file_put_contents($path ?? '', $html);
         $this->logMessage(sprintf('Saving HTML into %s', $path));
     }
 
@@ -143,9 +143,9 @@ trait DebugTools
         if (!$path) {
             return;
         }
-        $path = sprintf('%s/%s_%d.png', $path, basename($feature->getFile()), $step->getLine());
+        $path = sprintf('%s/%s_%d.png', $path, basename($feature->getFile() ?? ''), $step->getLine());
         $screenshot = $driver->getScreenshot();
-        file_put_contents($path, $screenshot);
+        file_put_contents($path ?? '', $screenshot);
         $this->logMessage(sprintf('Saving screenshot into %s', $path));
     }
 
@@ -161,16 +161,16 @@ trait DebugTools
             return;
         }
         Filesystem::makeFolder($path);
-        $path = realpath($path);
-        if (!file_exists($path)) {
+        $path = realpath($path ?? '');
+        if (!file_exists($path ?? '')) {
             $this->logMessage(sprintf('"%s" is not valid directory and failed to create it', $path));
             return;
         }
-        if (file_exists($path) && !is_dir($path)) {
+        if (file_exists($path ?? '') && !is_dir($path ?? '')) {
             $this->logMessage(sprintf('"%s" is not valid directory', $path));
             return;
         }
-        if (file_exists($path) && !is_writable($path)) {
+        if (file_exists($path ?? '') && !is_writable($path ?? '')) {
             $this->logMessage(sprintf('"%s" directory is not writable', $path));
             return;
         }
