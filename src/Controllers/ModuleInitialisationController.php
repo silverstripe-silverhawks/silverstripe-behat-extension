@@ -139,10 +139,10 @@ class ModuleInitialisationController implements Controller
         // Create feature_path
         $features = $this->container->getParameter('silverstripe_extension.context.features_path');
         $fullPath = $module->getResourcePath($features);
-        if (is_dir($fullPath)) {
+        if (is_dir($fullPath ?? '')) {
             return;
         }
-        mkdir($fullPath, 0777, true);
+        mkdir($fullPath ?? '', 0777, true);
         $output->writeln(
             "<info>{$fullPath}</info> - <comment>place your *.feature files here</comment>"
         );
@@ -165,13 +165,13 @@ class ModuleInitialisationController implements Controller
     {
         $classesPath = $this->container->getParameter('silverstripe_extension.context.class_path');
         $dirPath = $module->getResourcePath($classesPath);
-        if (!is_dir($dirPath)) {
-            mkdir($dirPath, 0777, true);
+        if (!is_dir($dirPath ?? '')) {
+            mkdir($dirPath ?? '', 0777, true);
         }
 
         // Scaffold base context file
         $classPath = "{$dirPath}/FeatureContext.php";
-        if (is_file($classPath)) {
+        if (is_file($classPath ?? '')) {
             return;
         }
 
@@ -185,7 +185,7 @@ class ModuleInitialisationController implements Controller
             'ClassName' => $class,
         ]);
         $classContent = $obj->renderWith(__DIR__.'/../../templates/FeatureContext.ss');
-        file_put_contents($classPath, $classContent);
+        file_put_contents($classPath ?? '', $classContent);
 
         // Log
         $output->writeln(
@@ -194,12 +194,12 @@ class ModuleInitialisationController implements Controller
 
         // Add to composer json
         $composerFile = $module->getResourcePath('composer.json');
-        if (!file_exists($composerFile)) {
+        if (!file_exists($composerFile ?? '')) {
             return;
         }
 
         // Add autoload directive to composer
-        $composerData = json_decode(file_get_contents($composerFile), true);
+        $composerData = json_decode(file_get_contents($composerFile ?? '') ?? '', true);
         if (json_last_error()) {
             throw new Exception(json_last_error_msg());
         }
@@ -211,7 +211,7 @@ class ModuleInitialisationController implements Controller
         }
         $composerData['autoload']['psr-4']["{$fullNamespace}\\"] = $classesPath;
         file_put_contents(
-            $composerFile,
+            $composerFile ?? '',
             json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
 
@@ -239,7 +239,7 @@ class ModuleInitialisationController implements Controller
     protected function getFixtureNamespace($namespaceRoot)
     {
         $namespaceSuffix = $this->container->getParameter('silverstripe_extension.context.namespace_suffix');
-        return trim($namespaceRoot, '/\\') . '\\' . $namespaceSuffix;
+        return trim($namespaceRoot ?? '', '/\\') . '\\' . $namespaceSuffix;
     }
 
     /**
@@ -252,7 +252,7 @@ class ModuleInitialisationController implements Controller
     protected function initConfig($output, $module, $namespaceRoot)
     {
         $configPath = $module->getResourcePath('behat.yml');
-        if (file_exists($configPath)) {
+        if (file_exists($configPath ?? '')) {
             return;
         }
         $class = $this->getFixtureClass($namespaceRoot);
@@ -279,7 +279,7 @@ class ModuleInitialisationController implements Controller
                 ]
             ]
         ];
-        file_put_contents($configPath, Yaml::dump($data, 99999999, 2));
+        file_put_contents($configPath ?? '', Yaml::dump($data, 99999999, 2));
 
         $output->writeln(
             "<info>{$configPath}</info> - <comment>default behat.yml created</comment>"

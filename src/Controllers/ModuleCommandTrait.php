@@ -17,8 +17,8 @@ trait ModuleCommandTrait
      */
     protected function getModule($name, $error = true)
     {
-        if (strpos($name, '@') === 0) {
-            $name = substr($name, 1);
+        if (strpos($name ?? '', '@') === 0) {
+            $name = substr($name ?? '', 1);
         }
         $module = ModuleLoader::inst()->getManifest()->getModule($name);
         if (!$module && $error) {

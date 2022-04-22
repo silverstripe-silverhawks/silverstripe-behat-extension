@@ -191,7 +191,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
             $regionObj = $this->getSession()->getPage()->find(
                 'css',
                 // Escape CSS selector
-                (false !== strpos($region, "'")) ? str_replace("'", "\\'", $region) : $region
+                (false !== strpos($region ?? '', "'")) ? str_replace("'", "\\'", $region) : $region
             );
             if ($regionObj) {
                 return $regionObj;
@@ -203,7 +203,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
         // Fall back to region identified by data-title.
         // Only apply if no double quotes exist in search string,
         // which would break the CSS selector.
-        if (false === strpos($region, '"')) {
+        if (false === strpos($region ?? '', '"')) {
             $regionObj = $this->getSession()->getPage()->find(
                 'css',
                 '[data-title="' . $region . '"]'
@@ -217,7 +217,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
         if (!$this->regionMap) {
             throw new \LogicException("Cannot find 'region_map' in the behat.yml");
         }
-        if (!array_key_exists($region, $this->regionMap)) {
+        if (!array_key_exists($region, $this->regionMap ?? [])) {
             throw new \LogicException("Cannot find the specified region in the behat.yml");
         }
         $regionObj = $this->getSession()->getPage()->find('css', $region);
@@ -265,7 +265,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
         }
 
         if ($screenSize = Environment::getEnv('BEHAT_SCREEN_SIZE')) {
-            list($screenWidth, $screenHeight) = explode('x', $screenSize);
+            list($screenWidth, $screenHeight) = explode('x', $screenSize ?? '');
             $this->getSession()->resizeWindow((int)$screenWidth, (int)$screenHeight);
         } else {
             $this->getSession()->resizeWindow(1024, 768);
@@ -312,7 +312,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
     public function getTestSessionState()
     {
         $extraParams = array();
-        parse_str(Environment::getEnv('TESTSESSION_PARAMS'), $extraParams);
+        parse_str(Environment::getEnv('TESTSESSION_PARAMS') ?? '', $extraParams);
         return array_merge(
             array(
                 'database' => $this->databaseName,
@@ -330,13 +330,13 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
      */
     public function parseUrl($url)
     {
-        $url = parse_url($url);
+        $url = parse_url($url ?? '');
         $url['vars'] = array();
         if (!isset($url['fragment'])) {
             $url['fragment'] = null;
         }
         if (isset($url['query'])) {
-            parse_str($url['query'], $url['vars']);
+            parse_str($url['query'] ?? '', $url['vars']);
         }
 
         return $url;
@@ -401,7 +401,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
 
         $parts = func_get_args();
         $trimSlashes = function (&$part) {
-            $part = trim($part, '/');
+            $part = trim($part ?? '', '/');
         };
         array_walk($parts, $trimSlashes);
 
@@ -600,7 +600,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
         $value = $field->getValue();
         $newValue = $opt->getAttribute('value');
         if (is_array($value)) {
-            if (!in_array($newValue, $value)) {
+            if (!in_array($newValue, $value ?? [])) {
                 $value[] = $newValue;
             }
         } else {
