@@ -1,6 +1,6 @@
 # SilverStripe Integration for Behat
 
-[![Build Status](https://api.travis-ci.com/silverstripe/silverstripe-behat-extension.svg?branch=4)](https://travis-ci.com/silverstripe/silverstripe-behat-extension)
+[![CI](https://github.com/silverstripe/silverstripe-behat-extension/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-behat-extension/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-behat-extension/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-behat-extension/?branch=master)
 [![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
