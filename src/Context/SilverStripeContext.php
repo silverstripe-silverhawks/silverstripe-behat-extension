@@ -510,7 +510,7 @@ abstract class SilverStripeContext extends MinkContext implements SilverStripeAw
         }
 
         $state = $this->testSessionEnvironment->getState();
-        $oldDatetime = \DateTime::createFromFormat('Y-m-d H:i:s', isset($state->datetime) ? $state->datetime : null);
+        $oldDatetime = \DateTime::createFromFormat('Y-m-d H:i:s', $state->datetime ?? '');
         if ($oldDatetime) {
             $newDatetime->setTime($oldDatetime->format('H'), $oldDatetime->format('i'), $oldDatetime->format('s'));
         }
