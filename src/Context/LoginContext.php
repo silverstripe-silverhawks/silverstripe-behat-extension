@@ -104,8 +104,8 @@ class LoginContext implements Context
             if ($btn->getText() !== 'Setup later') {
                 continue;
             }
-            // There's been issues clicking the button, so try waiting for a little bit
-            sleep(0.3);
+            // There's been issues clicking the button, so try waiting for 0.3 seconds
+            usleep(0.3 * 1000000);
             $btn->click();
             $clicked = true;
             break;
