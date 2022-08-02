@@ -1,15 +1,14 @@
-# SilverStripe Integration for Behat
+# Silverstripe Integration for Behat
 
 [![CI](https://github.com/silverstripe/silverstripe-behat-extension/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-behat-extension/actions/workflows/ci.yml)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-behat-extension/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-behat-extension/?branch=master)
-[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+[![Silverstripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
 ## Overview
 
 [Behat](http://behat.org) is a testing framework for behaviour-driven development.
 Because it primarily interacts with your website through a browser,
 you don't need any specific integration tools to get it going with
-a basic SilverStripe website, simply follow the
+a basic Silverstripe website, simply follow the
 [standard Behat usage instructions](http://docs.behat.org/en/latest/user_guide.html).
 
 This extension comes in handy if you want to go beyond
@@ -19,7 +18,7 @@ would need to be rolled back to a "clean slate" later on.
 
 It provides the following helpers:
 
- * Provide access to SilverStripe classes in your Behat contexts
+ * Provide access to Silverstripe classes in your Behat contexts
  * Set up a temporary database automatically
  * Reset the database content on every scenario
  * Prebuilt Contexts for SilverStripe's login forms and other common tasks
@@ -31,7 +30,7 @@ It provides the following helpers:
 
 In order to achieve this, the extension makes one basic assumption:
 Your Behat tests are run from the same application as the tested
-SilverStripe codebase, on a locally hosted website from the same codebase.
+Silverstripe codebase, on a locally hosted website from the same codebase.
 This is important because we need access to the underlying SilverStripe
 PHP classes. You can of course use a remote browser to do the actual testing.
 
@@ -39,20 +38,19 @@ Note: The extension has only been tested with the `selenium2` Mink driver.
 
 ## Installation
 
-Simply [install SilverStripe through Composer](http://doc.silverstripe.org/framework/en/installation/composer).
+Simply [install Silverstripe through Composer](http://doc.silverstripe.org/framework/en/installation/composer).
 Skip this step if adding the module to an existing project.
 
 	composer create-project silverstripe/installer my-test-project 4.x-dev
 
-Switch to the newly created webroot, and add the SilverStripe Behat extension.
+Switch to the newly created webroot, and add the Silverstripe Behat extension.
 
 	cd my-test-project
 	composer require --dev silverstripe/behat-extension
 
 Download the standalone [Google Chrome WebDriver](http://chromedriver.storage.googleapis.com/index.html?path=2.8/)
 
-
-Now install the SilverStripe project as usual by opening it in a browser and following the instructions.
+Now install the Silverstripe project as usual by opening it in a browser and following the instructions.
 Protip: You can skip this step by using `[SS_DATABASE_CHOOSE_NAME]` in a global
 [`.env`](https://docs.silverstripe.org/en/getting_started/environment_management/) file one level above the webroot.
 
@@ -106,7 +104,7 @@ Make sure you set `SS_BASE_URL` to `http://localhost:8080` in `.env`
 
 ## Configuration
 
-The SilverStripe installer already comes with a YML configuration
+The Silverstripe installer already comes with a YML configuration
 which is ready to run tests on the standalone ChromeDriver server,
 located in the project root as `behat.yml`.
 
@@ -117,7 +115,7 @@ which is a subclass of `Behat\MinkExtension\Extension`.
 
 Overview of settings (all in the `extensions.SilverStripe\BehatExtension\Extension` path):
 
- * `ajax_steps`: Because SilverStripe uses AJAX requests quite extensively, we had to invent a way
+ * `ajax_steps`: Because Silverstripe uses AJAX requests quite extensively, we had to invent a way
 to deal with them more efficiently and less verbose than just
 Optional `ajax_steps` is used to match steps defined there so they can be "caught" by
 [special AJAX handlers](http://blog.scur.pl/2012/06/ajax-callback-support-behat-mink/) that tweak the delays. You can either use a pipe delimited string or a list of substrings that match step definition.
@@ -166,7 +164,7 @@ Behat tests rely on a `FeatureContext` class which contains step definitions,
 and can be composed of other subcontexts, e.g. for SilverStripe-specific CMS steps
 (details on [behat.org](http://docs.behat.org/quick_intro.html#the-context-class-featurecontext)).
 Since step definitions are quite domain specific, its likely that you'll need your own context.
-The SilverStripe Behat extension provides an initializer script which generates a template
+The Silverstripe Behat extension provides an initializer script which generates a template
 in the recommended folder structure:
 
 	vendor/bin/behat --init @mymodule --namespace="MyVendor\MyModule"
@@ -186,7 +184,7 @@ To find out all available steps (and the files they are defined in), run the fol
 
 	vendor/bin/behat @mymodule --definitions=i
 
-Note: There are more specific step definitions in the SilverStripe `framework` module
+Note: There are more specific step definitions in the Silverstripe `framework` module
 for interacting with the CMS interfaces (see `framework/tests/behat/features/bootstrap`).
 In addition to the dynamic list, a cheatsheet of available steps can be found at the end of this guide.
 
@@ -258,7 +256,7 @@ use the inline definition syntax. The following example shows some syntax variat
 
 ### Directory Structure
 
-As a convention, SilverStripe Behat tests live in a `tests/behat` subfolder
+As a convention, Silverstripe Behat tests live in a `tests/behat` subfolder
 of your module. You can create it with the following commands:
 
 	mkdir -p mymodule/tests/behat/features/
@@ -329,7 +327,7 @@ check `BasicContext->handleAjaxBeforeStep()` and the `ajax_steps` configuration 
 
 ### Why does the module need to know about the framework path on the filesystem?
 
-Sometimes SilverStripe needs to know the URL of your site. When you're visiting
+Sometimes Silverstripe needs to know the URL of your site. When you're visiting
 your site in a web browser this is easy to work out, but if you're executing
 scripts on the command-line, it has no way of knowing.
 
@@ -350,7 +348,7 @@ viewed elements have the potential to disrupt testing.
 By building a test database from scratch, we're trying to minimize this impact.
 Some examples where things can go wrong nevertheless:
 
- * Thirdparty SilverStripe modules which install default data
+ * Thirdparty Silverstripe modules which install default data
  * Changes to the default interface language
  * Configurations which remove admin areas or specific fields
 
@@ -362,7 +360,7 @@ or run tests on a "sandbox" projects without these modules.
 
 First, read the console output. Behat will tell you which steps have failed.
 
-SilverStripe Behaviour Testing Framework also notifies you about some events.
+Silverstripe Behaviour Testing Framework also notifies you about some events.
 It tries to catch some JavaScript errors and AJAX errors as well although it
 is limited to errors that occur after the page is loaded.
 
@@ -626,7 +624,6 @@ It's based on the `vendor/bin/behat -di @cms` output.
 
 	Given /^the preview does not contain "([^"]*)"$/
 
-
 ### Fixtures
 
 	Given /^(?:(an|a|the) )"(?<type>[^"]+)" "(?<id>[^"]+)" (:?which )?redirects to (?:(an|a|the) )"(?<targetType>[^"]+)" "(?<targetId>[^"]+)"$/
@@ -651,7 +648,7 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	    - Example: Given the "page" "Page 1" is deleted
 
 	Given /^there are the following ([^\s]*) records$/
-	    - Accepts YAML fixture definitions similar to the ones used in SilverStripe unit testing.
+	    - Accepts YAML fixture definitions similar to the ones used in Silverstripe unit testing.
 
 	Given /^(?:(an|a|the) )"member" "(?<id>[^"]+)" belonging to "(?<groupId>[^"]+)"$/
 	    - Example: Given a "member" "Admin" belonging to "Admin Group"
@@ -669,7 +666,7 @@ It's based on the `vendor/bin/behat -di @cms` output.
 
 	Given /^the CMS settings have the following data$/
 		- Example: Given the CMS settings has the following data
-		- Note: It only works with the SilverStripe CMS module installed
+		- Note: It only works with the Silverstripe CMS module installed
 
 ### Environment
 
@@ -723,6 +720,6 @@ for example to cast any argument matching the `\d` regex into an actual PHP inte
 
 ## Useful resources
 
-* [SilverStripe CMS architecture](http://doc.silverstripe.org/sapphire/en/trunk/reference/cms-architecture)
-* [SilverStripe Framework Test Module](https://github.com/silverstripe-labs/silverstripe-frameworktest)
-* [SilverStripe Unit and Integration Testing](http://doc.silverstripe.org/sapphire/en/trunk/topics/testing)
+* [Silverstripe CMS architecture](http://doc.silverstripe.org/sapphire/en/trunk/reference/cms-architecture)
+* [Silverstripe Framework Test Module](https://github.com/silverstripe-labs/silverstripe-frameworktest)
+* [Silverstripe Unit and Integration Testing](http://doc.silverstripe.org/sapphire/en/trunk/topics/testing)
