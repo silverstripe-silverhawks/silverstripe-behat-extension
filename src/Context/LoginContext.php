@@ -4,6 +4,7 @@ namespace SilverStripe\BehatExtension\Context;
 
 use Behat\Behat\Context\Context;
 use Behat\Mink\Element\NodeElement;
+use LogicException;
 use PHPUnit\Framework\Assert;
 use SilverStripe\Security\Authenticator;
 use SilverStripe\Security\Group;
@@ -50,6 +51,26 @@ class LoginContext implements Context
         $email = "{$permCode}@example.org";
         $password = 'Secret!123';
         $this->generateMemberWithPermission($email, $password, $permCode);
+        $this->stepILogInWith($email, $password);
+    }
+
+    /**
+     * Creates and login as a member of a group with the correct permissions.
+     * Example: Given I am logged in as a member of "ADMIN" group
+     *
+     * @Given /^I am logged in as a member of "([^"]*)" group$/
+     * @param string $groupName
+     */
+    public function iAmLoggedInAsMemberOfGroup($groupName)
+    {
+        $group = Group::get()->filter('Title', "$groupName")->first();
+        if (!$group) {
+            throw new LogicException("Group $groupName does not exist");
+        }
+
+        $email = "{$groupName}@example.org";
+        $password = 'Secret!123';
+        $this->generateMember($email, $password, $group, $groupName);
         $this->stepILogInWith($email, $password);
     }
 
@@ -246,14 +267,26 @@ class LoginContext implements Context
      */
     protected function generateMemberWithPermission($email, $password, $permCode)
     {
+        $group = $this->generateGroupWithPermission($permCode);
+
+        return $this->generateMember($email, $password, $group, $permCode);
+    }
+
+    /**
+     * Get or generate a group with the given permission code
+     *
+     * @param string $permCode
+     * @return Member
+     */
+    protected function generateGroupWithPermission($permCode)
+    {
         // Get or create group
         $group = Group::get()->filter('Title', "$permCode group")->first();
         if (!$group) {
             $group = Group::create();
+            $group->Title = "$permCode group";
+            $group->write();
         }
-
-        $group->Title = "$permCode group";
-        $group->write();
 
         // Get or create permission
         $permission = Permission::create();
@@ -261,6 +294,20 @@ class LoginContext implements Context
         $permission->write();
         $group->Permissions()->add($permission);
 
+        return $group;
+    }
+
+    /**
+     * Get or generate a member with the given permission code and permission group
+     *
+     * @param string $email
+     * @param string $password
+     * @param object $group
+     * @param string $identifier
+     * @return Member
+     */
+    protected function generateMember($email, $password, $group, $identifier)
+    {
         // Get or create member
         $member = Member::get()->filter('Email', $email)->first();
         if (!$member) {
@@ -270,7 +317,7 @@ class LoginContext implements Context
         // make sure any validation for password is skipped, since we're not testing complexity here
         $validator = Member::password_validator();
         Member::set_password_validator(null);
-        $member->FirstName = $permCode;
+        $member->FirstName = $identifier;
         $member->Surname = "User";
         $member->Email = $email;
         $member->PasswordEncryption = "none";
