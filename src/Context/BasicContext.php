@@ -624,7 +624,7 @@ JS;
      * @param string $path
      * @return Call\Given
      *
-     * @deprecated 4.5..5.0 - use iAttachTheFileToTheField() instead
+     * @deprecated 4.5..5.0 Use iAttachTheFileToTheField() instead
      */
     public function iAttachTheFileTo($field, $path)
     {
