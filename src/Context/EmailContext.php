@@ -10,7 +10,9 @@ use PHPUnit\Framework\Assert;
 use SilverStripe\BehatExtension\Utility\TestMailer;
 use SilverStripe\Core\Injector\Injector;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 /**
  * Context used to define steps related to email sending.
@@ -48,7 +50,9 @@ class EmailContext implements Context
     {
         // Also set through the 'supportbehat' extension
         // to ensure its available both in CLI execution and the tested browser session
-        $this->mailer = new TestMailer();
+        $dispatcher = Injector::inst()->get(EventDispatcherInterface::class . '.mailer');
+        $transport = new NullTransport($dispatcher);
+        $this->mailer = new TestMailer($transport, $dispatcher);
         Injector::inst()->registerService($this->mailer, MailerInterface::class);
     }
 

@@ -2,8 +2,10 @@
 
 namespace SilverStripe\BehatExtension\Utility;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use SilverStripe\Dev\TestMailer as BaseTestMailer;
 use SilverStripe\TestSession\TestSessionEnvironment;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * Same principle as core TestMailer class,
@@ -17,8 +19,11 @@ class TestMailer extends BaseTestMailer
      */
     protected $testSessionEnvironment;
 
-    public function __construct()
-    {
+    public function __construct(
+        TransportInterface $transport,
+        EventDispatcherInterface $dispatcher
+    ) {
+        parent::__construct($transport, $dispatcher);
         $this->testSessionEnvironment = TestSessionEnvironment::singleton();
     }
 
