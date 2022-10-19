@@ -8,9 +8,9 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use SilverStripe\BehatExtension\Utility\TestMailer;
-use SilverStripe\Control\Email\Mailer;
 use SilverStripe\Core\Injector\Injector;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Mailer\MailerInterface;
 
 /**
  * Context used to define steps related to email sending.
@@ -49,7 +49,7 @@ class EmailContext implements Context
         // Also set through the 'supportbehat' extension
         // to ensure its available both in CLI execution and the tested browser session
         $this->mailer = new TestMailer();
-        Injector::inst()->registerService($this->mailer, Mailer::class);
+        Injector::inst()->registerService($this->mailer, MailerInterface::class);
     }
 
     /**
