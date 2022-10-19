@@ -25,7 +25,7 @@ class TestMailer extends BaseTestMailer
     /**
      * Clear the log of emails sent
      */
-    public function clearEmails()
+    public function clearEmails(): void
     {
         $state = $this->testSessionEnvironment->getState();
         if (isset($state->emails)) {
@@ -34,8 +34,12 @@ class TestMailer extends BaseTestMailer
         $this->testSessionEnvironment->applyState($state);
     }
 
-    public function findEmail($to = null, $from = null, $subject = null, $content = null)
-    {
+    public function findEmail(
+        string $to,
+        ?string $from = null,
+        ?string $subject = null,
+        ?string $content = null
+    ): ?array {
         $matches = $this->findEmails($to, $from, $subject, $content);
                 //got the count of matches emails
                 $emailCount = count($matches ?? []);
