@@ -2,10 +2,14 @@
 
 namespace SilverStripe\BehatExtension\Utility;
 
+use InvalidArgumentException;
+use SilverStripe\Control\Email\Email;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use SilverStripe\Dev\TestMailer as BaseTestMailer;
 use SilverStripe\TestSession\TestSessionEnvironment;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
 /**
  * Same principle as core TestMailer class,
@@ -25,6 +29,21 @@ class TestMailer extends BaseTestMailer
     ) {
         parent::__construct($transport, $dispatcher);
         $this->testSessionEnvironment = TestSessionEnvironment::singleton();
+    }
+
+    public function send(RawMessage $message, Envelope $envelope = null): void
+    {
+        parent::send($message, $envelope);
+        /** @var Email $email */
+        $email = $message;
+        $data = $this->createData($email);
+        // save email to testsession state
+        $state = $this->testSessionEnvironment->getState();
+        if (!isset($state->emails)) {
+            $state->emails = array();
+        }
+        $state->emails[] = array_filter($data ?? []);
+        $this->testSessionEnvironment->applyState($state);
     }
 
     /**
