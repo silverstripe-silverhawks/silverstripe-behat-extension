@@ -65,9 +65,10 @@ class TestMailer extends BaseTestMailer
         ?string $content = null
     ): ?array {
         $matches = $this->findEmails($to, $from, $subject, $content);
-                //got the count of matches emails
-                $emailCount = count($matches ?? []);
-                //get the last(latest) one
+        //got the count of matches emails
+        $emailCount = count($matches ?? []);
+        //get the last(latest) one
+
         return $matches ? $matches[$emailCount-1] : null;
     }
 
@@ -108,14 +109,14 @@ class TestMailer extends BaseTestMailer
                 }
             }
             if ($matched) {
-                $matches[] = $email;
+                $matches[] = json_decode(json_encode($email), true);
             }
         }
 
         return $matches;
     }
 
-    protected function saveEmail($data)
+    protected function saveEmail(array $data)
     {
         $state = $this->testSessionEnvironment->getState();
         if (!isset($state->emails)) {
