@@ -89,7 +89,7 @@ class EmailContext implements Context
         $match = $this->mailer->findEmail($to, $from, $subject);
         $allMails = $this->mailer->findEmails($to, $from);
         $allTitles = $allMails ? '"' . implode('","', array_map(function ($email) {
-            return $email->Subject;
+            return $email['Subject'];
         }, $allMails)) . '"' : null;
         if (trim($negate ?? '')) {
             Assert::assertNull($match);
@@ -174,7 +174,7 @@ class EmailContext implements Context
         $match = $this->mailer->findEmail($to, $from);
         Assert::assertNotNull($match);
 
-        $crawler = new Crawler($match->Content);
+        $crawler = new Crawler($match['Content']);
         $linkEl = $crawler->selectLink($linkSelector);
         Assert::assertNotNull($linkEl);
         $link = $linkEl->attr('href');
@@ -197,7 +197,7 @@ class EmailContext implements Context
         $match = $this->mailer->findEmail($to, $from, $title);
         Assert::assertNotNull($match);
 
-        $crawler = new Crawler($match->Content);
+        $crawler = new Crawler($match['Content']);
         $linkEl = $crawler->selectLink($linkSelector);
         Assert::assertNotNull($linkEl);
         $link = $linkEl->attr('href');
@@ -283,7 +283,7 @@ class EmailContext implements Context
      */
     public function thereIsAnEmailTitled($negate, $subject)
     {
-        $match = $this->mailer->findEmail(null, null, $subject);
+        $match = $this->mailer->findEmail('', null, $subject);
         if (trim($negate ?? '')) {
             Assert::assertNull($match);
         } else {
