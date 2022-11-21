@@ -138,7 +138,7 @@ class ModuleInitialisationController implements Controller
     {
         // Create feature_path
         $features = $this->container->getParameter('silverstripe_extension.context.features_path');
-        $fullPath = $module->getResourcePath($features);
+        $fullPath = $module->getResource($features)->getPath();
         if (is_dir($fullPath ?? '')) {
             return;
         }
@@ -164,7 +164,7 @@ class ModuleInitialisationController implements Controller
     protected function initClassPath(OutputInterface $output, Module $module, $namespaceRoot)
     {
         $classesPath = $this->container->getParameter('silverstripe_extension.context.class_path');
-        $dirPath = $module->getResourcePath($classesPath);
+        $dirPath = $module->getResource($classesPath)->getPath();
         if (!is_dir($dirPath ?? '')) {
             mkdir($dirPath ?? '', 0777, true);
         }
@@ -193,7 +193,7 @@ class ModuleInitialisationController implements Controller
         );
 
         // Add to composer json
-        $composerFile = $module->getResourcePath('composer.json');
+        $composerFile = $module->getResource('composer.json')->getPath();
         if (!file_exists($composerFile ?? '')) {
             return;
         }
@@ -251,7 +251,7 @@ class ModuleInitialisationController implements Controller
      */
     protected function initConfig($output, $module, $namespaceRoot)
     {
-        $configPath = $module->getResourcePath('behat.yml');
+        $configPath = $module->getResource('behat.yml')->getPath();
         if (file_exists($configPath ?? '')) {
             return;
         }
