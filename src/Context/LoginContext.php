@@ -242,7 +242,6 @@ class LoginContext implements Context
 
     /**
      * @Then /^the password for "([^"]*)" should be "([^"]*)"$/
-     * @skipUpgrade
      * @param string $id
      * @param string $password
      */
