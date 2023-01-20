@@ -21,6 +21,7 @@ use Facebook\WebDriver\WebDriverAlert;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverKeys;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Filesystem;
 use SilverStripe\BehatExtension\Utility\StepHelper;
@@ -1350,13 +1351,56 @@ JS;
      *
      * @Then /^I add "([^"]+)" to the "([^"]+)" tag field$/
      * @param string $value
-     * @param string $locator
+     * @param string $selector
      */
-    public function iAddToTheTagField($value, $locator)
+    public function iAddToTheTagField($value, $selector)
     {
-        $tagFieldInput = $this->getElement($locator);
-        $tagFieldInput->setValue($value);
-        $tagFieldInput->getParent()->getParent()->getParent()->getParent()->find('css', '.Select-menu-outer')->click();
+        $page = $this->getSession()->getPage();
+        /** @var NodeElement $parentElement */
+        $parentElement = null;
+        $dropdown = null;
+        $this->retryThrowable(function () use (&$parentElement, &$page, $selector) {
+            $parentElement = $page->find('css', $selector);
+            Assert::assertNotNull($parentElement, sprintf('"%s" element not found', $selector));
+            $page = $this->getSession()->getPage();
+        });
+
+        $this->retryThrowable(function () use (&$dropdown, $parentElement, $selector) {
+            $dropdown = $parentElement->find('css', '.ss-tag-field__dropdown-indicator');
+            Assert::assertNotNull($dropdown, sprintf('Unable to find the dropdown in "%s"', $selector));
+            $dropdown->click();
+        });
+
+        $inputField = null;
+        try {
+            // Try setting to a value already in the dropdown
+            $this->retryThrowable(function () use ($value, $parentElement, $selector) {
+                $element = $parentElement->find('xpath', sprintf('//*[count(*)=0 and .="%s"]', $value));
+                Assert::assertNotNull($element, sprintf('"%s" not found in "%s"', $value, $selector));
+                $element->click();
+            });
+        } catch (ExpectationFailedException $e) {
+            // Try creating a new value
+            $this->retryThrowable(function () use (&$inputField, $value, $parentElement, $selector) {
+                /** @var NodeElement $parentElement */
+                $inputField = $parentElement->find('css', '.ss-tag-field__input');
+                Assert::assertNotNull($inputField, sprintf('Could not create "%s" in "%s"', $value, $selector));
+                // We need to type the value in - react won't accept us just setting the value via js
+                $inputField->focus();
+                /** @var FacebookWebDriver $driver */
+                $driver = $this->getSession()->getDriver();
+                $keyboard = $driver->getWebDriver()->getKeyboard();
+                $keyboard->sendKeys($value);
+            });
+
+            // Try selecting the 'Create "$value"' option
+            $this->retryThrowable(function () use ($value, $parentElement, $selector) {
+                $createOption = 'Create "' . $value . '"';
+                $element = $parentElement->find('xpath', sprintf('//*[count(*)=0 and .=\'%s\']', $createOption));
+                Assert::assertNotNull($element, sprintf('"%s" not found in "%s"', $createOption, $selector));
+                $element->click();
+            });
+        }
     }
 
     /**
