@@ -125,10 +125,10 @@ class EmailContext implements Context
 
         $email = $this->lastMatchedEmail;
         $emailContent = null;
-        if ($email->Content) {
-            $emailContent = $email->Content;
+        if ($email['Content']) {
+            $emailContent = $email['Content'];
         } else {
-            $emailContent = $email->PlainContent;
+            $emailContent = $email['PlainContent'];
         }
 
         if (trim($negate ?? '')) {
@@ -154,8 +154,7 @@ class EmailContext implements Context
         }
 
         $email = $this->lastMatchedEmail;
-        $emailContent = ($email->Content) ? ($email->Content) : ($email->PlainContent);
-        $emailPlainText = strip_tags($emailContent ?? '');
+        $emailPlainText = $email['PlainContent'] ? $email['PlainContent'] : strip_tags($email['Content']);
         $emailPlainText = preg_replace("/\h+/", " ", $emailPlainText ?? '');
 
         Assert::assertStringContainsString($content, $emailPlainText);
@@ -219,7 +218,7 @@ class EmailContext implements Context
         }
 
         $match = $this->lastMatchedEmail;
-        $crawler = new Crawler($match->Content);
+        $crawler = new Crawler($match['Content']);
         $linkEl = $crawler->selectLink($linkSelector);
         Assert::assertNotNull($linkEl);
         $link = $linkEl->attr('href');
@@ -254,10 +253,10 @@ class EmailContext implements Context
 
         $email = $this->lastMatchedEmail;
         $emailContent = null;
-        if ($email->Content) {
-            $emailContent = $email->Content;
+        if ($email['Content']) {
+            $emailContent = $email['Content'];
         } else {
-            $emailContent = $email->PlainContent;
+            $emailContent = $email['PlainContent'];
         }
         // Convert html content to plain text
         $emailContent = strip_tags($emailContent ?? '');
@@ -309,9 +308,9 @@ class EmailContext implements Context
 
         $match = $this->lastMatchedEmail;
         if (trim($negate ?? '')) {
-            Assert::assertStringNotContainsString($from, $match->From);
+            Assert::assertStringNotContainsString($from, $match['From']);
         } else {
-            Assert::assertStringContainsString($from, $match->From);
+            Assert::assertStringContainsString($from, $match['From']);
         }
     }
 
@@ -328,9 +327,9 @@ class EmailContext implements Context
 
         $match = $this->lastMatchedEmail;
         if (trim($negate ?? '')) {
-            Assert::assertStringNotContainsString($to, $match->To);
+            Assert::assertStringNotContainsString($to, $match['To']);
         } else {
-            Assert::assertStringContainsString($to, $match->To);
+            Assert::assertStringContainsString($to, $match['To']);
         }
     }
 
@@ -348,7 +347,7 @@ class EmailContext implements Context
         }
 
         $email = $this->lastMatchedEmail;
-        $html = $email->Content;
+        $html = $email['Content'];
         $dom = new \DOMDocument();
         $dom->loadHTML($html);
 
