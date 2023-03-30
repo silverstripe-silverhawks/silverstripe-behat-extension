@@ -39,7 +39,7 @@ dependencies:
       cat << 'EOF' > _ss_environment.php
       <?php
       define('SS_DATABASE_SERVER', '127.0.0.1');
-      define('SS_DATABASE_CLASS', 'MySQLPDODatabase');
+      define('SS_DATABASE_CLASS', 'MySQLDatabase');
       define('SS_DATABASE_USERNAME', 'ubuntu');
       define('SS_DATABASE_PASSWORD', '');
       define('SS_ENVIRONMENT_TYPE', 'dev');
