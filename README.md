@@ -38,27 +38,21 @@ Note: The extension has only been tested with the `selenium2` Mink driver.
 
 ## Installation
 
-Simply [install Silverstripe through Composer](http://doc.silverstripe.org/framework/en/installation/composer).
-Skip this step if adding the module to an existing project.
+In a Silverstripe CMS project (see [getting started docs](https://docs.silverstripe.org/en/getting_started/)) add the Silverstripe Behat extension via Composer.
 
-	composer create-project silverstripe/installer my-test-project 4.x-dev
+```sh
+composer require --dev silverstripe/behat-extension
+```
 
-Switch to the newly created webroot, and add the Silverstripe Behat extension.
+Download the standalone [Google Chrome WebDriver](https://chromedriver.storage.googleapis.com/index.html)
 
-	cd my-test-project
-	composer require --dev silverstripe/behat-extension
-
-Download the standalone [Google Chrome WebDriver](http://chromedriver.storage.googleapis.com/index.html?path=2.8/)
-
-Now install the Silverstripe project as usual by opening it in a browser and following the instructions.
-Protip: You can skip this step by using `[SS_DATABASE_CHOOSE_NAME]` in a global
-[`.env`](https://docs.silverstripe.org/en/getting_started/environment_management/) file one level above the webroot.
-
-Unless you have [`SS_BASE_URL`](http://doc.silverstripe.org/framework/en/topics/commandline#configuration) set up, 
+Unless you have [`SS_BASE_URL`](http://doc.silverstripe.org/framework/en/topics/commandline#configuration) set up,
 you also need to specify the URL for your webroot. Either add it to the existing `behat.yml` configuration file
 in your project root, or set is as an environment variable in your terminal session:
 
-	export BEHAT_PARAMS="extensions[SilverStripe\BehatExtension\MinkExtension][base_url]=http://localhost/"
+```sh
+export BEHAT_PARAMS="extensions[SilverStripe\BehatExtension\MinkExtension][base_url]=http://localhost/"
+```
 
 ## Usage
 
@@ -66,17 +60,23 @@ in your project root, or set is as an environment variable in your terminal sess
 
 You can run the server locally in a separate Terminal session:
 
-    chromedriver
+```sh
+chromedriver
+```
 
 ### Running the Tests
 
 Now you can run the tests (for example for the `framework` module):
 
-	vendor/bin/behat @framework
+```sh
+vendor/bin/behat @framework
+```
 
 Or even run a single scenario by it's name (supports regular expressions):
 
-	vendor/bin/behat --name 'My scenario title' @framework
+```sh
+vendor/bin/behat --name 'My scenario title' @framework
+```
 
 This will start a Chrome browser by default. Other browsers and profiles can be configured in `behat.yml`.
 
@@ -85,7 +85,9 @@ This will start a Chrome browser by default. Other browsers and profiles can be 
 If running with `silverstripe/serve` and `chromedriver`, you can also use the following command
 which will automatically start and stop these services for individual tests.
 
-    vendor/bin/behat-ss @framework
+```sh
+vendor/bin/behat-ss @framework
+```
 
 This automates:
  - starting server
@@ -128,30 +130,32 @@ number that failed.
 
 Example: behat.yml
 
-	default:
-	  suites:
-	    framework:
-          paths:
-            - %paths.modules.framework%/tests/behat/features
-          contexts:
-            - SilverStripe\Framework\Tests\Behaviour\FeatureContext
-            - SilverStripe\Framework\Tests\Behaviour\CmsFormsContext
-            - SilverStripe\Framework\Tests\Behaviour\CmsUiContext
-            - SilverStripe\BehatExtension\Context\BasicContext
-            - SilverStripe\BehatExtension\Context\EmailContext
-            - SilverStripe\BehatExtension\Context\LoginContext
-            -
-              SilverStripe\BehatExtension\Context\FixtureContext:
-                - %paths.modules.framework%/tests/behat/features/files/
-	  extensions:
-        SilverStripe\BehatExtension\MinkExtension:
-          default_session: facebook_web_driver
-          javascript_session: facebook_web_driver
-          facebook_web_driver:
-            browser: chrome
-            wd_host: "http://127.0.0.1:9515" #chromedriver port
-        SilverStripe\BehatExtension\Extension:
-          screenshot_path: %paths.base%/artifacts/screenshots
+```yml
+default:
+    suites:
+    framework:
+        paths:
+        - '%paths.modules.framework%/tests/behat/features'
+        contexts:
+        - SilverStripe\Framework\Tests\Behaviour\FeatureContext
+        - SilverStripe\Framework\Tests\Behaviour\CmsFormsContext
+        - SilverStripe\Framework\Tests\Behaviour\CmsUiContext
+        - SilverStripe\BehatExtension\Context\BasicContext
+        - SilverStripe\BehatExtension\Context\EmailContext
+        - SilverStripe\BehatExtension\Context\LoginContext
+        -
+            SilverStripe\BehatExtension\Context\FixtureContext:
+            - '%paths.modules.framework%/tests/behat/features/files/'
+    extensions:
+    SilverStripe\BehatExtension\MinkExtension:
+        default_session: facebook_web_driver
+        javascript_session: facebook_web_driver
+        facebook_web_driver:
+        browser: chrome
+        wd_host: "http://127.0.0.1:9515" #chromedriver port
+    SilverStripe\BehatExtension\Extension:
+        screenshot_path: '%paths.base%/artifacts/screenshots'
+```
 
 ## Module Initialisation
 
@@ -167,9 +171,11 @@ Since step definitions are quite domain specific, its likely that you'll need yo
 The Silverstripe Behat extension provides an initializer script which generates a template
 in the recommended folder structure:
 
-	vendor/bin/behat --init @mymodule --namespace="MyVendor\MyModule"
+```sh
+vendor/bin/behat --init @mymodule --namespace="MyVendor\MyModule"
+```
 
-	Note: namespace is mandatory
+**Note: namespace is mandatory**
 
 You'll now have a class located in `mymodule/tests/behat/src/FeatureContext.php`,
 which will have a psr-4 class mapping added to composer.json by default.
@@ -182,7 +188,9 @@ The extension comes with several `BehatContext` subclasses come with some extra 
 Some of them are just helpful in general website testing, other's are specific to SilverStripe.
 To find out all available steps (and the files they are defined in), run the following:
 
-	vendor/bin/behat @mymodule --definitions=i
+```sh
+vendor/bin/behat @mymodule --definitions=i
+```
 
 Note: There are more specific step definitions in the Silverstripe `framework` module
 for interacting with the CMS interfaces (see `framework/tests/behat/features/bootstrap`).
@@ -207,38 +215,40 @@ scenario automatically.
 If you need more flexibility and transparency about which records are being created,
 use the inline definition syntax. The following example shows some syntax variations:
 
-	Feature: Do something with pages
-		As an site owner
-		I want to manage pages
+```cucumber
+Feature: Do something with pages
+    As an site owner
+    I want to manage pages
 
-		Background:
-			# Creates a new page without data. Can be accessed later under this identifier
-			Given a "page" "Page 1"
-			# Uses a custom RegistrationPage type
-			And an "error page" "Register"
-			# Creates a page with inline properties
-			And a "page" "Page 2" with "URLSegment"="page-1" and "Content"="my page 1"
-			# Field names can be tabular, and based on DataObject::$field_labels
-			And the "page" "Page 3" has the following data
-			 | Content | <blink> |
-			 | My Property | foo |
-			 | My Boolean | bar |
-			# Pages are published by default, can be explicitly unpublished
-			And the "page" "Page 1" is not published
-			# Create a hierarchy, and reference a record created earlier
-			And the "page" "Page 1.1" is a child of a "page" "Page 1"
-			# Specific page type step
-			And a "page" "My Redirect" which redirects to a "page" "Page 1"
-			And a "member" "Website User" with "FavouritePage"="=>Page.Page 1"
+    Background:
+        # Creates a new page without data. Can be accessed later under this identifier
+        Given a "page" "Page 1"
+        # Uses a custom RegistrationPage type
+        And an "error page" "Register"
+        # Creates a page with inline properties
+        And a "page" "Page 2" with "URLSegment"="page-1" and "Content"="my page 1"
+        # Field names can be tabular, and based on DataObject::$field_labels
+        And the "page" "Page 3" has the following data
+            | Content | <blink> |
+            | My Property | foo |
+            | My Boolean | bar |
+        # Pages are published by default, can be explicitly unpublished
+        And the "page" "Page 1" is not published
+        # Create a hierarchy, and reference a record created earlier
+        And the "page" "Page 1.1" is a child of a "page" "Page 1"
+        # Specific page type step
+        And a "page" "My Redirect" which redirects to a "page" "Page 1"
+        And a "member" "Website User" with "FavouritePage"="=>Page.Page 1"
 
-		@javascript
-		Scenario: View a page in the tree
-			Given I am logged in with "ADMIN" permissions
-			And I go to "/admin/pages"
-			Then I should see "Page 1" in CMS Tree
+    @javascript
+    Scenario: View a page in the tree
+        Given I am logged in with "ADMIN" permissions
+        And I go to "/admin/pages"
+        Then I should see "Page 1" in CMS Tree
+```
 
  * Fixtures are created where you defined them. If you want the fixtures to be created
-   before every scenario, define them in 
+   before every scenario, define them in
    [Background](http://docs.behat.org/en/latest/user_guide/writing_scenarios.html#backgrounds).
    If you want them to be created only when a particular scenario runs, define them there.
  * Fixtures are cleared between scenarios.
@@ -259,8 +269,10 @@ use the inline definition syntax. The following example shows some syntax variat
 As a convention, Silverstripe Behat tests live in a `tests/behat` subfolder
 of your module. You can create it with the following commands:
 
-	mkdir -p mymodule/tests/behat/features/
-	mkdir -p mymodule/tests/behat/src/
+```sh
+mkdir -p mymodule/tests/behat/features/
+mkdir -p mymodule/tests/behat/src/
+```
 
 ### FeatureContext
 
@@ -269,16 +281,17 @@ here as well. The only major difference is the base class from which
 to extend your own `FeatureContext`: It should be `SilverStripeContext`
 rather than `BehatContext`.
 
-Example: mymodule/tests/behat/src/FeatureContext.php
+Example: `mymodule/tests/behat/src/FeatureContext.php`
 
-	<?php
-	namespace MyModule\Test\Behaviour;
+```php
+namespace MyModule\Test\Behaviour;
 
-	use SilverStripe\BehatExtension\Context\SilverStripeContext;
+use SilverStripe\BehatExtension\Context\SilverStripeContext;
 
-	class FeatureContext extends SilverStripeContext
-	{
-	}
+class FeatureContext extends SilverStripeContext
+{
+}
+```
 
 ### Screen Size
 
@@ -287,7 +300,9 @@ define the desired browser window size through a `capabilities` definition.
 By default, Selenium doesn't support this though, so we've added a workaround
 through an environment variable:
 
-	BEHAT_SCREEN_SIZE=320x600 vendor/bin/behat
+```sh
+BEHAT_SCREEN_SIZE=320x600 vendor/bin/behat
+```
 
 ### Inspecting PHP sessions
 
@@ -298,15 +313,18 @@ of the `TestSessionEnvironment`, in order to share it with Behat CLI.
 
 Example: Retrieve the currently logged-in member
 
-    use SilverStripe\TestSession\TestsessionEnvironment;
+```php
+use SilverStripe\TestSession\TestsessionEnvironment;
 
-	$env = Injector::inst()->get(TestSessionEnvironment::class);
-	$state = $env->getState();
-	if(isset($state->session['loggedInAs'])) {
-		$member = \Member::get()->byID($state->session['loggedInAs']);
-	} else {
-		$member = null;
-	}
+$env = Injector::inst()->get(TestSessionEnvironment::class);
+$state = $env->getState();
+
+if (isset($state->session['loggedInAs'])) {
+    $member = \Member::get()->byID($state->session['loggedInAs']);
+} else {
+    $member = null;
+}
+```
 
 ## FAQ
 
@@ -387,19 +405,23 @@ otherwise you'll always have an active debugging session in CLI, never in the br
 
 Then you can choose to enable XDebug for the current CLI run:
 
-	XDEBUG_CONFIG="idekey=macgdbp" vendor/bin/behat
+```sh
+XDEBUG_CONFIG="idekey=macgdbp" vendor/bin/behat
+```
 
 Or you can use the `TESTSESSION_PARAMS` environment variable to pass additional
 parameters to `dev/testsession/start`, and debug in the browser instead.
 
-	TESTSESSION_PARAMS="XDEBUG_SESSION_START=macgdbp" vendor/bin/behat @app
+```sh
+TESTSESSION_PARAMS="XDEBUG_SESSION_START=macgdbp" vendor/bin/behat @app
+```
 
 The `macgdbp` IDE key needs to match your `xdebug.idekey` php.ini setting.
 
 ### How do I set up continuous integration through Travis?
 
 Check out the [travis.yml](https://github.com/silverstripe/silverstripe-framework/blob/master/.travis.yml)
-in `silverstripe/framework` for a good example on how to set up Behat tests through 
+in `silverstripe/framework` for a good example on how to set up Behat tests through
 [travis-ci.org](http://travis-ci.org).
 
 ## Cheatsheet
@@ -410,6 +432,7 @@ It's based on the `vendor/bin/behat -di @cms` output.
 
 ### Basics
 
+```cucumber
 	 Then /^(?:|I )should see "(?P<text>(?:[^"]|\\")*)"$/
 	    - Checks, that page contains specified text.
 
@@ -473,9 +496,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	Then /^the "([^"]*)" table should not contain "([^"]*)"$/
 
 	Given /^I click on "([^"]*)" in the "([^"]*)" table$/
+```
 
 ### Navigation
 
+```cucumber
 	Given /^(?:|I )am on homepage$/
 	    - Opens homepage.
 
@@ -496,9 +521,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 
 	 When /^(?:|I )move forward one page$/
 	    - Moves forward one page in history
+```
 
 ### Forms
 
+```cucumber
 	When /^(?:|I )press "(?P<button>(?:[^"]|\\")*)"$/
 	    - Presses button with specified id|name|title|alt|value.
 
@@ -562,9 +589,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	  - Check an individual input button from a group of inputs
 	  - Example: I select "Admins" from "Groups" input group
 	   (where "Groups" is the title of the CheckboxSetField or OptionsetField form field)
+```
 
 ### Interactions
 
+```cucumber
 	Given /^I press the "([^"]*)" button$/
 
 	Given /^I (click|double click) "([^"]*)" in the "([^"]*)" element$/
@@ -582,9 +611,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	Given /^I confirm the dialog$/
 
 	Given /^I dismiss the dialog$/
+```
 
 ### Login
 
+```cucumber
 	Given /^I am logged in with "([^"]*)" permissions$/
 	    - Creates a member in a group with the correct permissions.
 
@@ -595,9 +626,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	Given /^I should see a log-in form$/
 
 	 Then /^I will see a "bad" log-in message$/
+```
 
 ### CMS UI
 
+```cucumber
 	 Then /^I should see an edit page form$/
 
 	 Then /^I should see the CMS$/
@@ -619,9 +652,11 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	Given /^the preview contains "([^"]*)"$/
 
 	Given /^the preview does not contain "([^"]*)"$/
+```
 
 ### Fixtures
 
+```cucumber
 	Given /^(?:(an|a|the) )"(?<type>[^"]+)" "(?<id>[^"]+)" (:?which )?redirects to (?:(an|a|the) )"(?<targetType>[^"]+)" "(?<targetId>[^"]+)"$/
 	    - Find or create a redirector page and link to another existing page.
 
@@ -663,14 +698,18 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	Given /^the CMS settings have the following data$/
 		- Example: Given the CMS settings has the following data
 		- Note: It only works with the Silverstripe CMS module installed
+```
 
 ### Environment
 
+```cucumber
 	Given /^the current date is "([^"]*)"$/
 	Given /^the current time is "([^"]*)"$/
+```
 
 ### Email
 
+```cucumber
 	Given /^there should (not |)be an email (to|from) "([^"]*)"$/
 
 	Given /^there should (not |)be an email (to|from) "([^"]*)" titled "([^"]*)"$/
@@ -697,6 +736,7 @@ It's based on the `vendor/bin/behat -di @cms` output.
 
     When /^I click on the http link "([^"]*)" in the email$/
         - Example: When I click on the http link "http://localhost/changepassword" in the email
+```
 
 ### Transformations
 
@@ -704,18 +744,18 @@ Behat [transformations](http://docs.behat.org/en/v2.5/guides/2.definitions.html#
 have the ability to change step arguments based on their original value,
 for example to cast any argument matching the `\d` regex into an actual PHP integer.
 
- * `/^(?:(the|a)) time of (?<val>.*)$/`: Transforms relative time statements compatible with 
- [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the time of 1 hour ago" might 
+ * `/^(?:(the|a)) time of (?<val>.*)$/`: Transforms relative time statements compatible with
+ [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the time of 1 hour ago" might
  return "22:00:00" if its currently "23:00:00".
- * `/^(?:(the|a)) date of (?<val>.*)$/`: Transforms relative date statements compatible with 
- [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the date of 2 days ago" might 
+ * `/^(?:(the|a)) date of (?<val>.*)$/`: Transforms relative date statements compatible with
+ [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the date of 2 days ago" might
  return "2013-10-10" if its currently the 12th of October 2013.
- * `/^(?:(the|a)) datetime of (?<val>.*)$/`: Transforms relative date and time statements compatible with 
- [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the datetime of 2 days ago" might 
+ * `/^(?:(the|a)) datetime of (?<val>.*)$/`: Transforms relative date and time statements compatible with
+ [strtotime()](http://www.php.net/manual/en/datetime.formats.relative.php). Example: "the datetime of 2 days ago" might
  return "2013-10-10 23:00:00" if its currently the 12th of October 2013.
 
 ## Useful resources
 
-* [Silverstripe CMS architecture](http://doc.silverstripe.org/sapphire/en/trunk/reference/cms-architecture)
+* [Silverstripe CMS architecture](https://docs.silverstripe.org/sapphire/en/trunk/reference/cms-architecture)
 * [Silverstripe Framework Test Module](https://github.com/silverstripe-labs/silverstripe-frameworktest)
-* [Silverstripe Unit and Integration Testing](http://doc.silverstripe.org/sapphire/en/trunk/topics/testing)
+* [Silverstripe Unit and Integration Testing](https://docs.silverstripe.org/sapphire/en/trunk/topics/testing)
