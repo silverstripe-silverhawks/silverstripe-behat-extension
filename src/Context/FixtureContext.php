@@ -289,22 +289,23 @@ class FixtureContext implements Context
      * @param string $null
      * @param TableNode $fieldsTable
      */
-    public function stepCreateRecordWithTable($type, $id, $null, TableNode $fieldsTable)
+    public function stepCreateRecordWithTable($type, $id, TableNode $fieldsTable)
     {
+
         $class = $this->convertTypeToClass($type);
         // TODO Support more than one record
         $fields = $this->convertFields($class, $fieldsTable->getRowsHash());
         $fields = $this->prepareFixture($class, $id, $fields);
 
         // We should check if this fixture object already exists - if it does, we update it. If not, we create it
-        if ($existingFixture = $this->fixtureFactory->get($class, $id)) {
+        if ($existingFixture = $this->getFixtureFactory()->get($class, $id)) {
             // Merge existing data with new data, and create new object to replace existing object
             foreach ($fields as $k => $v) {
                 $existingFixture->$k = $v;
             }
             $existingFixture->write();
         } else {
-            $this->fixtureFactory->createObject($class, $id, $fields);
+            $this->getFixtureFactory()->createObject($class, $id, $fields);
         }
     }
 
