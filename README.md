@@ -240,11 +240,11 @@ Feature: Do something with pages
         And a "page" "My Redirect" which redirects to a "page" "Page 1"
         And a "member" "Website User" with "FavouritePage"="=>Page.Page 1"
 
-    @javascript
-    Scenario: View a page in the tree
-        Given I am logged in with "ADMIN" permissions
-        And I go to "/admin/pages"
-        Then I should see "Page 1" in CMS Tree
+        @javascript
+        Scenario: View a page in the tree
+            Given I am logged in with "ADMIN" permissions
+            And I go to "/admin/pages"
+            Then I should see "Page 1"
 ```
 
  * Fixtures are created where you defined them. If you want the fixtures to be created
