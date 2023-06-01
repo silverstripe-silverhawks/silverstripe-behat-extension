@@ -235,7 +235,7 @@ use the inline definition syntax. The following example shows some syntax variat
 		Scenario: View a page in the tree
 			Given I am logged in with "ADMIN" permissions
 			And I go to "/admin/pages"
-			Then I should see "Page 1" in CMS Tree
+			Then I should see "Page 1"
 
  * Fixtures are created where you defined them. If you want the fixtures to be created
    before every scenario, define them in 
