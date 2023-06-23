@@ -664,7 +664,7 @@ It's based on the `vendor/bin/behat -di @cms` output.
 	    - Example: Given a "page" "Page 1"
 
 	Given /^(?:(an|a|the) )"(?<type>[^"]+)" "(?<id>[^"]+)" with (?<data>.*)$/
-	    - Example: Given a "page" "Page 1" with "URL"="page-1" and "Content"="my page 1"
+	    - Example: Given a "page" "Page 1" with "URLSegment"="page-1" and "Content"="my page 1"
 
 	Given /^(?:(an|a|the) )"(?<type>[^"]+)" "(?<id>[^"]+)" has the following data$/
 	    - Example: And the "page" "Page 2" has the following data
