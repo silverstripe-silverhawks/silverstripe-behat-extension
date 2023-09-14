@@ -30,6 +30,7 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Core\Config\Config;
 
 /**
  * Context used to create fixtures in the SilverStripe ORM.
@@ -659,7 +660,16 @@ class FixtureContext implements Context
 
         // Add the extension to the CLI context
         /** @var Extensible $targetClass */
-        $targetClass = $this->convertTypeToClass($class);
+        try {
+            $targetClass = $this->convertTypeToClass($class);
+        } catch (InvalidArgumentException $e) {
+            // will end up here if the class is not a subclass of DataObject
+            if (class_exists($class)) {
+                $targetClass = $class;
+            } else {
+                throw $e;
+            }
+        }
         $targetClass::add_extension($extension);
 
         // Write config for this extension too...

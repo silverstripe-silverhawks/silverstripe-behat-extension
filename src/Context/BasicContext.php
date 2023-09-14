@@ -546,6 +546,17 @@ JS;
     }
 
     /**
+     * @Then /^the "([^"]+)" element "([^"]+)" attribute should be "([^"]*)"$/
+     */
+    public function theElementAttributeShouldBe($selector, $attribute, $value)
+    {
+        $page = $this->getSession()->getPage();
+        $element = $page->find('css', $selector);
+        Assert::assertNotNull($element, sprintf('Element %s not found', $selector));
+        Assert::assertEquals($value, $element->getAttribute($attribute));
+    }
+
+    /**
      * @Given /^I see the text "([^"]+)" in the alert$/
      * @param string $expected
      */
