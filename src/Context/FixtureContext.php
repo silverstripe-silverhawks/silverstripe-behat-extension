@@ -30,6 +30,7 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Core\Config\Config;
 
 /**
  * Context used to create fixtures in the SilverStripe ORM.
@@ -664,7 +665,16 @@ class FixtureContext implements Context
 
         // Add the extension to the CLI context
         /** @var Extensible $targetClass */
-        $targetClass = $this->convertTypeToClass($class);
+        try {
+            $targetClass = $this->convertTypeToClass($class);
+        } catch (InvalidArgumentException $e) {
+            // will end up here if the class is not a subclass of DataObject
+            if (class_exists($class)) {
+                $targetClass = $class;
+            } else {
+                throw $e;
+            }
+        }
         $targetClass::add_extension($extension);
         if (!array_key_exists($targetClass, $this->addedExtensions)) {
             $this->addedExtensions[$targetClass] = [];
@@ -893,6 +903,70 @@ YAML;
     protected function getAssetStore()
     {
         return Injector::inst()->get(AssetStore::class);
+    }
+
+    /**
+     * Selects the first image match in the HTML editor (tinymce)
+     *
+     * @When /^I select the image "([^"]+)" in the "([^"]+)" HTML field$/
+     * @param string $filename
+     * @param string $field
+     */
+    public function iSelectTheImageInHtmlField($filename, $field)
+    {
+        $this->selectInTheHtmlField("img[src*='$filename']", $field);
+    }
+
+    /**
+     * Selects the first match of $select in the given HTML editor (tinymce)
+     */
+    protected function selectInTheHtmlField(string $select, string $field)
+    {
+        $inputField = $this->getHtmlField($field);
+        $inputField->getParent()->find('css', 'iframe')->click();
+        $inputFieldId = $inputField->getAttribute('id');
+        $js = <<<JS
+        var editor = jQuery('#$inputFieldId').entwine('ss').getEditor(),
+            doc = editor.getInstance().getDoc(),
+            sel = doc.getSelection(),
+            rng = new Range(),
+            matched = false;
+
+        jQuery(doc).find("$select").each(function() {
+            if(!matched) {
+                rng.selectNode(this);
+                sel.removeAllRanges();
+                sel.addRange(rng);
+                matched = true;
+            }
+        });
+        JS;
+        $this->getMainContext()->getSession()->executeScript($js);
+    }
+
+    /**
+     * Locate an HTML editor field
+     *
+     * @param string $locator Raw html field identifier as passed from
+     * @return NodeElement
+     */
+    protected function getHtmlField($locator)
+    {
+        $locator = str_replace('\\"', '"', $locator ?? '');
+        $page = $this->getMainContext()->getSession()->getPage();
+        $element = $page->find('css', 'textarea.htmleditor[name=\'' . $locator . '\']');
+        if ($element) {
+            return $element;
+        }
+        $label = $page->findAll('xpath', sprintf('//label[contains(text(), \'%s\')]', $locator));
+        if (!empty($label)) {
+            Assert::assertCount(1, $label, "Found more than one element containing the phrase \"$locator\"");
+            $label = array_shift($label);
+            $fieldId = $label->getAttribute('for');
+            $element = $page->find('css', '#' . $fieldId);
+        }
+        Assert::assertNotNull($element, sprintf('HTML field "%s" not found', $locator));
+        return $element;
     }
 
     /**
