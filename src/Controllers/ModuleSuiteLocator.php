@@ -186,7 +186,7 @@ class ModuleSuiteLocator implements Controller
         // Resolve variables
         $resolvedConfig = $this->container->getParameterBag()->resolveValue($suiteConfig);
         return [
-            'type' => null, // @todo figure out what this is for
+            'type' => null,
             'settings' => $resolvedConfig,
         ];
     }
