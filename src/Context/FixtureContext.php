@@ -299,7 +299,6 @@ class FixtureContext implements Context
     {
 
         $class = $this->convertTypeToClass($type);
-        // TODO Support more than one record
         $fields = $this->convertFields($class, $fieldsTable->getRowsHash());
         $fields = $this->prepareFixture($class, $id, $fields);
 
@@ -522,7 +521,6 @@ class FixtureContext implements Context
         $yaml = implode("\n  ", $yaml);
 
         // Save fixtures into database
-        // TODO Run prepareAsset() for each File and Folder record
         $yamlFixture = new YamlFixture($yaml);
         $yamlFixture->writeInto($this->getFixtureFactory());
     }
